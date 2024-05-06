@@ -9,7 +9,7 @@ func NewRouter() *httprouter.Router {
 	router := httprouter.New()
 
 	// OauthGoogle
-	router.POST("/auth/google/login", oauthGoogleLogin)
+	router.GET("/auth/google/login", oauthGoogleLogin)
 	router.POST("/auth/google/callback", oauthGoogleCallback)
 
 	router.PanicHandler = exception.ErrorHandler

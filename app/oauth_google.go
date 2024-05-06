@@ -13,21 +13,9 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/spf13/viper"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
-// Scopes: OAuth 2.0 scopes provide a way to limit the amount of access that is granted to an access token.
-var googleOauthConfig = &oauth2.Config{
-	RedirectURL:  viper.GetString("GOOGLE_OAUTH_REDIRECT_URL"),
-	ClientID:     viper.GetString("GOOGLE_OAUTH_CLIENT_ID"),
-	ClientSecret: viper.GetString("GOOGLE_OAUTH_CLIENT_SECRET"),
-	Scopes:       []string{viper.GetString("GOOGLE_OAUTH_SCOPES")},
-	Endpoint:     google.Endpoint,
-}
-
 func oauthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-
 	// Create oauthState cookie
 	oauthState := generateStateOauthCookie(w)
 
@@ -35,7 +23,7 @@ func oauthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 		AuthCodeURL receive state that is a token to protect the user from CSRF attacks. You must always provide a non-empty string and
 		validate that it matches the the state query parameter on your redirect callback.
 	*/
-	u := googleOauthConfig.AuthCodeURL(oauthState)
+	u := AppConfig.GoogleLoginConfig.AuthCodeURL(oauthState)
 	http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 }
 
@@ -77,7 +65,7 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 func getUserDataFromGoogle(code string) ([]byte, error) {
 	// Use code to get token and get user info from Google.
 
-	token, err := googleOauthConfig.Exchange(context.Background(), code)
+	token, err := AppConfig.GoogleLoginConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, fmt.Errorf("code exchange wrong: %s", err.Error())
 	}
