@@ -1,4 +1,4 @@
-package app
+package controller
 
 import (
 	"context"
@@ -6,16 +6,24 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/Lezonn/fin-tools-api/config"
 	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-func oauthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+type LoginControllerImpl struct {
+}
+
+func NewLoginController() LoginController {
+	return &LoginControllerImpl{}
+}
+
+func (l *LoginControllerImpl) OAuthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// Create oauthState cookie
 	oauthState := generateStateOauthCookie(w)
 
@@ -23,11 +31,11 @@ func oauthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 		AuthCodeURL receive state that is a token to protect the user from CSRF attacks. You must always provide a non-empty string and
 		validate that it matches the the state query parameter on your redirect callback.
 	*/
-	u := AppConfig.GoogleLoginConfig.AuthCodeURL(oauthState)
+	u := config.AppConfig.GoogleLoginConfig.AuthCodeURL(oauthState)
 	http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 }
 
-func oauthGoogleCallback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (l *LoginControllerImpl) OAuthGoogleCallback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// Read oauthState from Cookie
 	oauthState, _ := r.Cookie("oauthstate")
 
@@ -39,7 +47,7 @@ func oauthGoogleCallback(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 
 	data, err := getUserDataFromGoogle(r.FormValue("code"))
 	if err != nil {
-		log.Println(err.Error())
+		logrus.Error(err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -65,7 +73,7 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 func getUserDataFromGoogle(code string) ([]byte, error) {
 	// Use code to get token and get user info from Google.
 
-	token, err := AppConfig.GoogleLoginConfig.Exchange(context.Background(), code)
+	token, err := config.AppConfig.GoogleLoginConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, fmt.Errorf("code exchange wrong: %s", err.Error())
 	}

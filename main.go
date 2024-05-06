@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/Lezonn/fin-tools-api/app"
+	"github.com/Lezonn/fin-tools-api/config"
 	"github.com/Lezonn/fin-tools-api/helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	err := app.NewConfig()
+	err := config.NewConfig()
 	helper.PanicIfError(err)
 
 	server := http.Server{
