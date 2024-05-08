@@ -3,8 +3,8 @@ package exception
 import (
 	"net/http"
 
-	"github.com/Lezonn/fin-tools-api/helper"
-	"github.com/Lezonn/fin-tools-api/model/web"
+	"github.com/Lezonn/fin-tools-api/internal/helper"
+	"github.com/Lezonn/fin-tools-api/internal/model/web"
 	"github.com/go-playground/validator/v10"
 )
 

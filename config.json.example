@@ -1,0 +1,30 @@
+{
+  "server": {
+    "domain": "localhost",
+    "port": "8080"
+  },
+  "log": {
+    "level": 6
+  },
+  "google": {
+    "oauth": {
+      "client_id": "<YOUR_CLIENT_ID>",
+      "client_secret": "<YOUR_CLIENT_SECRET>",
+      "redirect_url": "http://localhost:8080/auth/google/callback",
+      "scopes": "https://www.googleapis.com/auth/userinfo.email",
+      "url_api": "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
+    }
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "localhost",
+    "port": 3306,
+    "name": "fin-tools",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}
