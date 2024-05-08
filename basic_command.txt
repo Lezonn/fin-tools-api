@@ -1,0 +1,17 @@
+RUN WEB SERVER
+- go run cmd/web/main.go
+
+RUN TEST
+- go test -v ./test/
+
+CREATE TABLE
+- migrate create -ext sql -dir db/migrations create_table_first
+- ext param value is based on what db we are using
+
+RUN DB MIGRATION
+- migrate -database "mysql://<USER>:<PASSWORD>@tcp(localhost:<PORT>)/<DB_NAME>" -path db/migrations up
+- migrate -database "mysql://<USER>:<PASSWORD>@tcp(localhost:<PORT>)/<DB_NAME>" -path db/migrations down
+- example: migrate -database "mysql://root@tcp(localhost:3306)/go_db_migration" -path db/migrations up
+
+CHECK MIGRATION VERSION
+- migrate -database "mysql://root@tcp(localhost:3306)/go_db_migration" -path db/migrations version
