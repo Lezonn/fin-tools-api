@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -40,7 +39,7 @@ func (l *LoginControllerImpl) OAuthGoogleCallback(w http.ResponseWriter, r *http
 	oauthState, _ := r.Cookie("oauthstate")
 
 	if r.FormValue("state") != oauthState.Value {
-		log.Println("invalid oauth google state")
+		logrus.Println("invalid oauth google state")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
