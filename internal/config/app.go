@@ -1,22 +1,21 @@
 package config
 
 import (
-	nethttp "net/http"
-
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/route"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
 
 type BootstrapConfig struct {
+	App               *fiber.App
 	Log               *logrus.Logger
 	Validate          *validator.Validate
 	Config            *viper.Viper
 	GoogleLoginConfig *oauth2.Config
-	Server            *nethttp.Server
 }
 
 func Bootstrap(config *BootstrapConfig) {
@@ -24,7 +23,7 @@ func Bootstrap(config *BootstrapConfig) {
 	loginController := http.NewLoginController(config.Config, config.GoogleLoginConfig, config.Log)
 
 	routeConfig := route.RouteConfig{
-		Server:          config.Server,
+		App:             config.App,
 		LoginController: loginController,
 	}
 

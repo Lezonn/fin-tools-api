@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
@@ -29,49 +29,51 @@ func NewLoginController(config *viper.Viper, googleLoginConfig *oauth2.Config, l
 	}
 }
 
-func (l *LoginController) OAuthGoogleLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (l *LoginController) OAuthGoogleLogin(ctx fiber.Ctx) error {
 	// Create oauthState cookie
-	oauthState := generateStateOauthCookie(w)
+	oauthState := generateStateOauthCookie(ctx)
 
 	/*
 		AuthCodeURL receive state that is a token to protect the user from CSRF attacks. You must always provide a non-empty string and
 		validate that it matches the the state query parameter on your redirect callback.
 	*/
 	u := l.GoogleLoginConfig.AuthCodeURL(oauthState)
-	http.Redirect(w, r, u, http.StatusTemporaryRedirect)
+	err := ctx.Redirect().Status(fiber.StatusTemporaryRedirect).To(u)
+	return err
 }
 
-func (l *LoginController) OAuthGoogleCallback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (l *LoginController) OAuthGoogleCallback(ctx fiber.Ctx) error {
 	// Read oauthState from Cookie
-	oauthState, _ := r.Cookie("oauthstate")
+	oauthState := ctx.Cookies("oauthstate")
 
-	if r.FormValue("state") != oauthState.Value {
-		logrus.Println("invalid oauth google state")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
+	if ctx.FormValue("state") != oauthState {
+		logrus.Error("invalid oauth google state")
+		err := ctx.Redirect().Status(fiber.StatusTemporaryRedirect).To("/")
+		return err
 	}
 
-	data, err := getUserDataFromGoogle(l.Config, l.GoogleLoginConfig, r.FormValue("code"))
+	data, err := getUserDataFromGoogle(l.Config, l.GoogleLoginConfig, ctx.FormValue("code"))
 	if err != nil {
 		logrus.Error(err.Error())
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
+		err := ctx.Redirect().Status(fiber.StatusTemporaryRedirect).To("/")
+		return err
 	}
 
 	// GetOrCreate User in your db.
 	// Redirect or response with a token.
 	// More code .....
-	fmt.Fprintf(w, "UserInfo: %s\n", data)
+	ctx.SendString("UserInfo: " + string(data))
+	return nil
 }
 
-func generateStateOauthCookie(w http.ResponseWriter) string {
+func generateStateOauthCookie(ctx fiber.Ctx) string {
 	var expiration = time.Now().Add(365 * 24 * time.Hour)
 
 	b := make([]byte, 16)
 	rand.Read(b)
 	state := base64.URLEncoding.EncodeToString(b)
-	cookie := http.Cookie{Name: "oauthstate", Value: state, Expires: expiration}
-	http.SetCookie(w, &cookie)
+	cookie := &fiber.Cookie{Name: "oauthstate", Value: state, Expires: expiration}
+	ctx.Cookie(cookie)
 
 	return state
 }

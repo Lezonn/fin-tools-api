@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Lezonn/fin-tools-api/internal/config"
-	"github.com/sirupsen/logrus"
+	"github.com/gofiber/fiber/v3"
 )
 
 func main() {
@@ -10,19 +12,20 @@ func main() {
 	log := config.NewLogger(viperConfig)
 	validate := config.NewValidator()
 	googleLoginConfig := config.NewGoogleLoginConfig(viperConfig)
-	server := config.NewServer(viperConfig)
+	app := config.NewFiber(viperConfig)
 
 	config.Bootstrap(&config.BootstrapConfig{
+		App:               app,
 		Log:               log,
 		Validate:          validate,
 		Config:            viperConfig,
 		GoogleLoginConfig: googleLoginConfig,
-		Server:            server,
 	})
 
-	logrus.Info("Starting HTTP Server. Listening at " + server.Addr)
-
-	err := server.ListenAndServe()
+	webPort := viperConfig.GetInt("web.port")
+	err := app.Listen(fmt.Sprintf(":%d", webPort), fiber.ListenConfig{
+		EnablePrefork: viperConfig.GetBool("web.prefork"),
+	})
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
