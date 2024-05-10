@@ -1,7 +1,10 @@
 {
-  "server": {
-    "domain": "localhost",
-    "port": "8080"
+  "app": {
+    "name": "fin-tools-api"
+  },
+  "web": {
+    "prefork": false,
+    "port": 8080
   },
   "log": {
     "level": 6
