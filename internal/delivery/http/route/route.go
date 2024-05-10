@@ -16,13 +16,16 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
+	c.App.Static("/static", "./public")
+
 	c.App.Get("/", func(ctx fiber.Ctx) error {
 		return ctx.SendString("Hello World")
 	})
 
 	// Auth
-	c.App.Get("/auth/google/login", c.LoginController.OAuthGoogleLogin)
+	// c.App.Get("/auth/google", c.LoginController.OAuthGoogleLogin)
 	c.App.Get("/auth/google/callback", c.LoginController.OAuthGoogleCallback)
+	// c.App.Get("/auth/google/logout", c.LoginController.OAuthGoogleLogout)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
