@@ -9,9 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 )
 
 type BootstrapConfig struct {
+	DB                *gorm.DB
 	App               *fiber.App
 	Log               *logrus.Logger
 	Validate          *validator.Validate

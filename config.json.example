@@ -19,15 +19,29 @@
     }
   },
   "database": {
-    "username": "root",
-    "password": "",
-    "host": "localhost",
-    "port": 3306,
-    "name": "fin-tools",
-    "pool": {
-      "idle": 10,
-      "max": 100,
-      "lifetime": 300
+    "test": {
+      "username": "root",
+      "password": "",
+      "host": "localhost",
+      "port": 3306,
+      "name": "fin_tools_test",
+      "pool": {
+        "idle": 10,
+        "max": 100,
+        "lifetime": 300
+      }
+    },
+    "dev": {
+      "username": "root",
+      "password": "",
+      "host": "localhost",
+      "port": 3306,
+      "name": "fin_tools",
+      "pool": {
+        "idle": 10,
+        "max": 100,
+        "lifetime": 300
+      }
     }
   }
 }
