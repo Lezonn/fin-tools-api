@@ -10,11 +10,13 @@ import (
 func main() {
 	viperConfig := config.NewViper()
 	log := config.NewLogger(viperConfig)
+	db := config.NewDatabase(viperConfig, log, "dev")
 	validate := config.NewValidator()
 	googleLoginConfig := config.NewGoogleLoginConfig(viperConfig)
 	app := config.NewFiber(viperConfig)
 
 	config.Bootstrap(&config.BootstrapConfig{
+		DB:                db,
 		App:               app,
 		Log:               log,
 		Validate:          validate,
