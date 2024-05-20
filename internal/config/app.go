@@ -23,7 +23,7 @@ type BootstrapConfig struct {
 
 func Bootstrap(config *BootstrapConfig) {
 	// setup controller
-	loginController := http.NewLoginController(config.Config, config.GoogleLoginConfig, config.Log)
+	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log)
 
 	// setup middleware
 	config.App.Use(middleware.NewCors())
