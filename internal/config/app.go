@@ -28,6 +28,7 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup middleware
 	config.App.Use(middleware.NewCors())
 	config.App.Use(middleware.NewLogger())
+	config.App.Use(middleware.NewEncryptCookie())
 
 	// setup route
 	routeConfig := route.RouteConfig{
