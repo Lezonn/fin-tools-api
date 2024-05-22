@@ -7,7 +7,7 @@ import (
 
 type RouteConfig struct {
 	App             *fiber.App
-	LoginController *http.LoginController
+	LoginController *http.UserController
 }
 
 func (c *RouteConfig) Setup() {
