@@ -8,7 +8,7 @@ import (
 var encryptCookieConfig = encryptcookie.Config{
 	Next:      nil,
 	Except:    []string{},
-	Key:       "",
+	Key:       encryptcookie.GenerateKey(),
 	Encryptor: encryptcookie.EncryptCookie,
 	Decryptor: encryptcookie.DecryptCookie,
 }
