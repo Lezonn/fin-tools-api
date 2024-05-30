@@ -22,8 +22,6 @@ func (c *RouteConfig) SetupGuestRoute() {
 		return ctx.SendString("Hello World")
 	})
 
-	// Auth
-	// c.App.Get("/auth/google", c.LoginController.OAuthGoogleLogin)
 	c.App.Get("/auth/google/callback", c.LoginController.OAuthGoogleCallback)
 	// c.App.Get("/auth/google/logout", c.LoginController.OAuthGoogleLogout)
 }
