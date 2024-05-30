@@ -4,6 +4,8 @@ import (
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/route"
+	"github.com/Lezonn/fin-tools-api/internal/repository"
+	"github.com/Lezonn/fin-tools-api/internal/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
@@ -22,8 +24,14 @@ type BootstrapConfig struct {
 }
 
 func Bootstrap(config *BootstrapConfig) {
+	// setup repository
+	userRepository := repository.NewUserRepository(config.Log)
+
+	// setup service
+	userService := service.NewUserService(config.DB, config.Log, config.Validate, userRepository)
+
 	// setup controller
-	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log)
+	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log, userService)
 
 	// setup middleware
 	config.App.Use(middleware.NewCors())

@@ -3,12 +3,15 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/Lezonn/fin-tools-api/internal/entity"
+	"github.com/Lezonn/fin-tools-api/internal/model"
 	"github.com/Lezonn/fin-tools-api/internal/repository"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -51,26 +54,24 @@ func NewUserService(db *gorm.DB, logger *logrus.Logger, validate *validator.Vali
 func (s *UserService) LoginWithGoogle(ctx context.Context, authCode string, config *viper.Viper, googleConfig *oauth2.Config) (string, error) {
 	token, err := googleConfig.Exchange(ctx, authCode)
 	if err != nil {
-		s.Log.Warnf("code exchange failed: %s", err.Error())
+		s.Log.WithError(err).Error("code exchange failed")
 		return "", fiber.ErrInternalServerError
 	}
 
-	userData, err := s.getUserDataFromGoogle(ctx, config, token.AccessToken)
+	userInfo, err := s.getUserDataFromGoogle(ctx, config, token.AccessToken)
 	if err != nil {
-		s.Log.Warn("get user data from google failed")
+		s.Log.WithError(err).Error("get user data from google failed")
 		return "", fiber.ErrInternalServerError
 	}
 
-	var user map[string]any
-	err = json.Unmarshal(userData, &user)
-	if err != nil {
-		s.Log.Warnf("failed to parse user data: %s", err.Error())
-		return "", err
+	if err = s.RegisterUser(&userInfo); err != nil {
+		s.Log.WithError(err).Error("register user failed")
+		return "", fiber.ErrInternalServerError
 	}
 
-	jwtToken, err := s.generateJWT(user, config)
+	jwtToken, err := s.generateJWT(&userInfo, config)
 	if err != nil {
-		s.Log.Warnf("failed to generate jwt: %s", err.Error())
+		s.Log.WithError(err).Error("failed to generate jwt")
 		return "", fiber.ErrInternalServerError
 	}
 
@@ -90,27 +91,35 @@ func (s *UserService) LoginWithGoogle(ctx context.Context, authCode string, conf
 // Returns:
 //   - []byte: A byte slice containing the user data from Google.
 //   - error: An error if any error occurs during the request or response handling.
-func (s *UserService) getUserDataFromGoogle(ctx context.Context, config *viper.Viper, accessToken string) ([]byte, error) {
+func (s *UserService) getUserDataFromGoogle(ctx context.Context, config *viper.Viper, accessToken string) (model.GoogleUserInfo, error) {
 	googleOauthUrlApi := config.GetString("google.oauth.url_api")
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, googleOauthUrlApi+accessToken, nil)
 	if err != nil {
-		s.Log.Warnf("failed creating request: %s", err.Error())
-		return nil, fiber.ErrInternalServerError
+		s.Log.WithError(err).Error("failed creating request")
+		return model.GoogleUserInfo{}, fiber.ErrInternalServerError
 	}
 
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
-		s.Log.Warnf("failed getting user info: %s", err.Error())
-		return nil, fiber.ErrInternalServerError
+		s.Log.WithError(err).Error("failed getting user info")
+		return model.GoogleUserInfo{}, fiber.ErrInternalServerError
 	}
 	defer response.Body.Close()
 
 	contents, err := io.ReadAll(response.Body)
 	if err != nil {
-		s.Log.Warnf("failed read response: %s", err.Error())
-		return nil, fiber.ErrInternalServerError
+		s.Log.WithError(err).Error("failed read response")
+		return model.GoogleUserInfo{}, fiber.ErrInternalServerError
 	}
-	return contents, nil
+
+	var user model.GoogleUserInfo
+	err = json.Unmarshal(contents, &user)
+	if err != nil {
+		s.Log.WithError(err).Error("failed to parse user data")
+		return model.GoogleUserInfo{}, err
+	}
+
+	return user, nil
 }
 
 // generateJWT generates a JSON Web Token (JWT) using the provided user data and configuration settings.
@@ -124,10 +133,10 @@ func (s *UserService) getUserDataFromGoogle(ctx context.Context, config *viper.V
 // Returns:
 // - A string representing the JSON Web Token (JWT).
 // - An error if any error occurs during the process, such as signing the token.
-func (s *UserService) generateJWT(user map[string]any, config *viper.Viper) (string, error) {
+func (s *UserService) generateJWT(user *model.GoogleUserInfo, config *viper.Viper) (string, error) {
 	claims := jwt.MapClaims{
-		"name":  user["name"].(string),
-		"email": user["email"].(string),
+		"name":  user.Name,
+		"email": user.Email,
 		"iss":   "fin-tools",
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
@@ -136,9 +145,31 @@ func (s *UserService) generateJWT(user map[string]any, config *viper.Viper) (str
 	jwtSecret := config.GetString("jwt_secret")
 	jwtToken, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
-		s.Log.Warnf("failed to sign token: %s", err.Error())
+		s.Log.WithError(err).Error("failed to sign token")
 		return "", err
 	}
 
 	return jwtToken, nil
+}
+
+func (s *UserService) RegisterUser(userInfo *model.GoogleUserInfo) error {
+	user := &entity.User{}
+
+	err := s.UserRepository.GetByGoogleID(s.DB, user, userInfo.ID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		user.Email = userInfo.Email
+		user.Name = userInfo.Name
+		user.GoogleID = userInfo.ID
+
+		err = s.UserRepository.Repository.Create(s.DB, user)
+		if err != nil {
+			s.Log.WithError(err).Error("failed to create user")
+			return err
+		}
+	} else if err != nil {
+		s.Log.WithError(err).Error("failed to get user by google id")
+		return err
+	}
+
+	return nil
 }

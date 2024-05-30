@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Lezonn/fin-tools-api/internal/helper"
-	"github.com/Lezonn/fin-tools-api/internal/model/web"
+	"github.com/Lezonn/fin-tools-api/internal/model"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -29,7 +29,7 @@ func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusBadRequest)
 
-	webResponse := web.WebResponse{
+	webResponse := model.WebResponse{
 		Code:   http.StatusBadRequest,
 		Status: http.StatusText(http.StatusBadRequest),
 		Data:   exception.Error(),
@@ -48,7 +48,7 @@ func notFoundError(writer http.ResponseWriter, _ *http.Request, err any) bool {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusNotFound)
 
-	webResponse := web.WebResponse{
+	webResponse := model.WebResponse{
 		Code:   http.StatusNotFound,
 		Status: http.StatusText(http.StatusNotFound),
 		Data:   exception.Error,
@@ -62,7 +62,7 @@ func internalServerError(writer http.ResponseWriter, _ *http.Request, err any) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusInternalServerError)
 
-	webResponse := web.WebResponse{
+	webResponse := model.WebResponse{
 		Code:   http.StatusInternalServerError,
 		Status: http.StatusText(http.StatusInternalServerError),
 		Data:   err,
