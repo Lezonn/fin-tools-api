@@ -1,11 +1,9 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
-
 	"github.com/Lezonn/fin-tools-api/internal/entity"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -19,7 +17,6 @@ func NewUserRepository(log *logrus.Logger) *UserRepository {
 	}
 }
 
-func (u *UserRepository) GetOrCreate(ctx context.Context, tx *sql.Tx, user entity.User) entity.User {
-
-	return user
+func (u *UserRepository) GetByGoogleID(db *gorm.DB, user *entity.User, googleID string) error {
+	return db.Where("google_id = ?", googleID).First(user).Error
 }
