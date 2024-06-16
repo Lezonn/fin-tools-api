@@ -11,7 +11,7 @@ CREATE TABLE
 RUN DB MIGRATION
 - migrate -database "mysql://<USER>:<PASSWORD>@tcp(localhost:<PORT>)/<DB_NAME>" -path db/migrations up
 - migrate -database "mysql://<USER>:<PASSWORD>@tcp(localhost:<PORT>)/<DB_NAME>" -path db/migrations down
-- example: migrate -database "mysql://root@tcp(localhost:3306)/go_db_migration" -path db/migrations up
+- example: migrate -database "mysql://root@tcp(localhost:3306)/fin_tools" -path db/migrations up
 
 CHECK MIGRATION VERSION
-- migrate -database "mysql://root@tcp(localhost:3306)/go_db_migration" -path db/migrations version
+- migrate -database "mysql://root@tcp(localhost:3306)/fin_tools" -path db/migrations version
