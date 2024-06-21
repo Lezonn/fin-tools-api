@@ -4,6 +4,7 @@ create table expenses(
   expense_category_id bigint not null default 0,
   amount bigint not null default 0,
   note text,
+  expense_date bigint not null,
   created_at bigint not null,
   updated_at bigint not null,
   primary key (id),
