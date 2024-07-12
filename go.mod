@@ -1,6 +1,6 @@
 module github.com/Lezonn/fin-tools-api
 
-go 1.21.7
+go 1.22.5
 
 require (
 	github.com/go-playground/validator/v10 v10.20.0

@@ -15,3 +15,6 @@ RUN DB MIGRATION
 
 CHECK MIGRATION VERSION
 - migrate -database "mysql://root@tcp(localhost:3306)/fin_tools" -path db/migrations version
+
+RUN LIVE RELOAD
+- air

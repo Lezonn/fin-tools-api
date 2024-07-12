@@ -22,3 +22,8 @@ go.work
 
 # Config file
 config.json
+
+# Air
+/tmp
+post_cmd.txt
+pre_cmd.txt
