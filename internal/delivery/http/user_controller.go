@@ -59,11 +59,11 @@ func (c *UserController) OAuthGoogleCallback(ctx fiber.Ctx) error {
 	}
 
 	ctx.Cookie(&fiber.Cookie{
-		Name:     "authentication",
+		Name:     "auth",
 		Value:    jwtToken,
-		HTTPOnly: true,
 		MaxAge:   60 * 60 * 24 * 30,
 		SameSite: fiber.CookieSameSiteStrictMode,
+		HTTPOnly: true,
 		Secure:   true,
 	})
 

@@ -51,12 +51,13 @@ func (s *UserService) LoginWithGoogle(ctx context.Context, authCode string, conf
 		return "", fiber.ErrInternalServerError
 	}
 
-	if err = s.registerUser(&userInfo); err != nil {
+	user, err := s.registerUser(&userInfo)
+	if err != nil {
 		s.Log.WithError(err).Error("register user failed")
 		return "", fiber.ErrInternalServerError
 	}
 
-	jwtToken, err := s.generateJWT(&userInfo, config)
+	jwtToken, err := s.generateJWT(user, config)
 	if err != nil {
 		s.Log.WithError(err).Error("failed to generate jwt")
 		return "", fiber.ErrInternalServerError
@@ -96,7 +97,7 @@ func (s *UserService) getUserDataFromGoogle(ctx context.Context, config *viper.V
 	return user, nil
 }
 
-func (s *UserService) registerUser(userInfo *model.GoogleUserInfo) error {
+func (s *UserService) registerUser(userInfo *model.GoogleUserInfo) (*entity.User, error) {
 	user := &entity.User{}
 
 	err := s.UserRepository.GetByGoogleID(s.DB, user, userInfo.ID)
@@ -108,22 +109,21 @@ func (s *UserService) registerUser(userInfo *model.GoogleUserInfo) error {
 		err = s.UserRepository.Repository.Create(s.DB, user)
 		if err != nil {
 			s.Log.WithError(err).Error("failed to create user")
-			return err
+			return nil, err
 		}
 	} else if err != nil {
 		s.Log.WithError(err).Error("failed to get user by google id")
-		return err
+		return nil, err
 	}
 
-	return nil
+	return user, nil
 }
 
-func (s *UserService) generateJWT(user *model.GoogleUserInfo, config *viper.Viper) (string, error) {
+func (s *UserService) generateJWT(user *entity.User, config *viper.Viper) (string, error) {
 	claims := jwt.MapClaims{
-		"name":  user.Name,
-		"email": user.Email,
-		"iss":   "fin-tools",
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"id":  user.ID,
+		"iss": "fin-tools",
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
