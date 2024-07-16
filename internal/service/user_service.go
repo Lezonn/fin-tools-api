@@ -121,7 +121,7 @@ func (s *UserService) registerUser(userInfo *model.GoogleUserInfo) (*entity.User
 
 func (s *UserService) generateJWT(user *entity.User, config *viper.Viper) (string, error) {
 	claims := jwt.MapClaims{
-		"id":  user.ID,
+		"sub": user.ID,
 		"iss": "fin-tools",
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
