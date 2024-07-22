@@ -6,5 +6,11 @@ import (
 )
 
 func NewCors() fiber.Handler {
-	return cors.New(cors.ConfigDefault)
+	corsConfig := cors.ConfigDefault
+	corsConfig.AllowHeaders = "*"
+	corsConfig.AllowMethods = "GET, POST, PUT, DELETE"
+	corsConfig.AllowOrigins = "http://localhost:5173"
+	corsConfig.AllowCredentials = true
+
+	return cors.New(corsConfig)
 }
