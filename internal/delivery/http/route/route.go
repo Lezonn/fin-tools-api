@@ -2,15 +2,20 @@ package route
 
 import (
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
+	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/gofiber/fiber/v3"
 )
 
 type RouteConfig struct {
-	App             *fiber.App
-	LoginController *http.UserController
+	App               *fiber.App
+	LoginController   *http.UserController
+	ExpenseController *http.ExpenseController
 }
 
 func (c *RouteConfig) Setup() {
+	c.App.Use(middleware.NewLogger())
+	c.App.Use(middleware.NewCors())
+
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
 }
