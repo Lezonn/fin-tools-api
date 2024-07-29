@@ -2,15 +2,22 @@ package route
 
 import (
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
+	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/gofiber/fiber/v3"
 )
 
 type RouteConfig struct {
-	App             *fiber.App
-	LoginController *http.UserController
+	App               *fiber.App
+	TestController    *http.TestController
+	LoginController   *http.UserController
+	ExpenseController *http.ExpenseController
+	AuthMiddleware    fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
+	c.App.Use(middleware.NewLogger())
+	c.App.Use(middleware.NewCors())
+
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
 }
@@ -27,5 +34,6 @@ func (c *RouteConfig) SetupGuestRoute() {
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-
+	c.App.Use(c.AuthMiddleware)
+	c.App.Get("/test-auth-resource", c.TestController.GetMessage)
 }

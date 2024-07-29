@@ -26,23 +26,27 @@ type BootstrapConfig struct {
 func Bootstrap(config *BootstrapConfig) {
 	// setup repository
 	userRepository := repository.NewUserRepository(config.Log)
+	expenseRepository := repository.NewExpenseRepository(config.Log)
 
 	// setup service
-	userService := service.NewUserService(config.DB, config.Log, config.Validate, userRepository)
+	userService := service.NewUserService(config.Config, config.DB, config.Log, config.Validate, userRepository)
+	expenseService := service.NewExpenseService(config.DB, config.Log, config.Validate, expenseRepository)
 
 	// setup controller
 	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log, userService)
+	expenseController := http.NewExpenseController(config.Log, expenseService)
+	testController := http.NewTestController(config.Config, config.Log)
 
 	// setup middleware
-	config.App.Use(middleware.NewCors())
-	config.App.Use(middleware.NewLogger())
-	config.App.Use(middleware.NewEncryptCookie())
-	config.App.Use(middleware.NewCsrf())
+	authMiddleware := middleware.NewAuth(userService)
 
 	// setup route
 	routeConfig := route.RouteConfig{
-		App:             config.App,
-		LoginController: loginController,
+		App:               config.App,
+		LoginController:   loginController,
+		ExpenseController: expenseController,
+		TestController:    testController,
+		AuthMiddleware:    authMiddleware,
 	}
 
 	routeConfig.Setup()

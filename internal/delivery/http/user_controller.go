@@ -12,38 +12,23 @@ import (
 )
 
 type UserController struct {
-	Log               *logrus.Logger
 	Config            *viper.Viper
 	GoogleLoginConfig *oauth2.Config
+	Log               *logrus.Logger
 	Service           *service.UserService
 }
 
-func NewUserController(config *viper.Viper, googleLoginConfig *oauth2.Config,
-	logger *logrus.Logger, service *service.UserService) *UserController {
+func NewUserController(config *viper.Viper, googleLoginConfig *oauth2.Config, logger *logrus.Logger,
+	service *service.UserService) *UserController {
 	return &UserController{
+		Config:            config,
 		GoogleLoginConfig: googleLoginConfig,
 		Log:               logger,
-		Config:            config,
 		Service:           service,
 	}
 }
 
 func (c *UserController) OAuthGoogleCallback(ctx fiber.Ctx) error {
-	// authCookie := ctx.Cookies("authentication")
-
-	// fmt.Println(authCookie)
-	// if authCookie != "" {
-	// 	claims := jwt.MapClaims{}
-	// 	_, err := jwt.ParseWithClaims(authCookie, claims, func(token *jwt.Token) (any, error) {
-	// 		return []byte(c.Config.GetString("jwt_secret")), nil
-	// 	})
-	// 	if err != nil {
-	// 		c.Log.Error(err.Error())
-	// 		return fiber.ErrBadRequest
-	// 	}
-	// 	fmt.Println(claims)
-	// }
-
 	authCode := ctx.FormValue("code")
 
 	jwtToken, err := c.Service.LoginWithGoogle(
@@ -58,19 +43,14 @@ func (c *UserController) OAuthGoogleCallback(ctx fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	ctx.Cookie(&fiber.Cookie{
-		Name:     "auth",
-		Value:    jwtToken,
-		MaxAge:   60 * 60 * 24 * 30,
-		SameSite: fiber.CookieSameSiteStrictMode,
-		HTTPOnly: true,
-		Secure:   true,
-	})
+	response := model.UserResponse{
+		Token: jwtToken,
+	}
 
 	ctx.JSON(model.WebResponse{
 		Code:   http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
-		Data:   true,
+		Data:   response,
 	})
 
 	return nil
