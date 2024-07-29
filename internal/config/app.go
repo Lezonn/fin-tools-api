@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
-	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/route"
 	"github.com/Lezonn/fin-tools-api/internal/repository"
 	"github.com/Lezonn/fin-tools-api/internal/service"
@@ -34,10 +33,6 @@ func Bootstrap(config *BootstrapConfig) {
 	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log, userService)
 
 	// setup middleware
-	config.App.Use(middleware.NewCors())
-	config.App.Use(middleware.NewLogger())
-	config.App.Use(middleware.NewEncryptCookie())
-	config.App.Use(middleware.NewCsrf())
 
 	// setup route
 	routeConfig := route.RouteConfig{
