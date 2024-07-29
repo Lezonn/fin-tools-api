@@ -35,6 +35,7 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup controller
 	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log, userService)
 	expenseController := http.NewExpenseController(config.Log, expenseService)
+	testController := http.NewTestController(config.Config, config.Log)
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userService)
@@ -44,6 +45,7 @@ func Bootstrap(config *BootstrapConfig) {
 		App:               config.App,
 		LoginController:   loginController,
 		ExpenseController: expenseController,
+		TestController:    testController,
 		AuthMiddleware:    authMiddleware,
 	}
 

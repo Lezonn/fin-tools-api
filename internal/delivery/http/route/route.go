@@ -8,6 +8,7 @@ import (
 
 type RouteConfig struct {
 	App               *fiber.App
+	TestController    *http.TestController
 	LoginController   *http.UserController
 	ExpenseController *http.ExpenseController
 	AuthMiddleware    fiber.Handler
@@ -34,4 +35,5 @@ func (c *RouteConfig) SetupGuestRoute() {
 
 func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Use(c.AuthMiddleware)
+	c.App.Get("/test-auth-resource", c.TestController.GetMessage)
 }
