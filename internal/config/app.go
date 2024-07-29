@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http"
+	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/route"
 	"github.com/Lezonn/fin-tools-api/internal/repository"
 	"github.com/Lezonn/fin-tools-api/internal/service"
@@ -36,12 +37,14 @@ func Bootstrap(config *BootstrapConfig) {
 	expenseController := http.NewExpenseController(config.Log, expenseService)
 
 	// setup middleware
+	authMiddleware := middleware.NewAuth(userService)
 
 	// setup route
 	routeConfig := route.RouteConfig{
 		App:               config.App,
 		LoginController:   loginController,
 		ExpenseController: expenseController,
+		AuthMiddleware:    authMiddleware,
 	}
 
 	routeConfig.Setup()

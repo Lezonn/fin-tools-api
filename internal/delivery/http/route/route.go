@@ -10,6 +10,7 @@ type RouteConfig struct {
 	App               *fiber.App
 	LoginController   *http.UserController
 	ExpenseController *http.ExpenseController
+	AuthMiddleware    fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -32,5 +33,5 @@ func (c *RouteConfig) SetupGuestRoute() {
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-
+	c.App.Use(c.AuthMiddleware)
 }

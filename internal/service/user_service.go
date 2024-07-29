@@ -22,20 +22,36 @@ import (
 )
 
 type UserService struct {
+	Config         *viper.Viper
 	DB             *gorm.DB
 	Log            *logrus.Logger
 	Validate       *validator.Validate
 	UserRepository *repository.UserRepository
 }
 
-func NewUserService(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
+func NewUserService(config *viper.Viper, db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
 	userRepository *repository.UserRepository) *UserService {
 	return &UserService{
+		Config:         config,
 		DB:             db,
 		Log:            logger,
 		Validate:       validate,
 		UserRepository: userRepository,
 	}
+}
+
+func (s *UserService) Verify(ctx context.Context, token string) (*model.Auth, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return []byte(s.Config.GetString("jwt_secret")), nil
+	})
+	if err != nil {
+		s.Log.Error(err.Error())
+		return nil, fiber.ErrUnauthorized
+	}
+
+	userID := int64(claims["sub"].(float64))
+	return &model.Auth{ID: userID}, nil
 }
 
 func (s *UserService) LoginWithGoogle(ctx context.Context, authCode string, config *viper.Viper, googleConfig *oauth2.Config) (string, error) {
