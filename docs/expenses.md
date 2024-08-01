@@ -1,10 +1,10 @@
 # Expenses API
-1. Add Expense
+1. Create Expense
 
 ---
 
-### Add Expense
-> Used to add new expense.
+### Create Expense
+> Used to create new expense.
 
 + Endpoint: **`/api/v1/expenses`**
 + HTTP Method: **`POST`**

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/Lezonn/fin-tools-api/internal/model"
 	"github.com/Lezonn/fin-tools-api/internal/service"
 	"github.com/gofiber/fiber/v3"
 )
@@ -26,4 +27,8 @@ func NewAuth(userService *service.UserService) fiber.Handler {
 
 		return ctx.Next()
 	}
+}
+
+func GetUser(ctx fiber.Ctx) *model.Auth {
+	return ctx.Locals("auth").(*model.Auth)
 }

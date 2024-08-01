@@ -1,0 +1,12 @@
+### Create expense
+POST http://localhost:8080/api/expenses
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}
+
+{
+  "expense_category_id": 2,
+  "amount": 50000,
+  "note": "Gas",
+  "expense_date": 1722330689
+}
