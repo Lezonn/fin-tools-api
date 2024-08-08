@@ -38,7 +38,7 @@
 ```json5
 {
   "code": 500,
-  "status": "INTERNAL_SERVER_ERROR",
+  "status": "Internal Server Error",
   "message": "Error message here"
 }
 ```
@@ -65,7 +65,7 @@
 ```json5
 {
   "code": 404,
-  "status": "NOT_FOUND",
+  "status": "Not Found",
   "message": "Error message here"
 }
 ```
@@ -74,7 +74,7 @@
 ```json5
 {
   "code": 500,
-  "status": "INTERNAL_SERVER_ERROR",
+  "status": "Internal Server Error",
   "message": "Error message here"
 }
 ```
