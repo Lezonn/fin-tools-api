@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
 	"github.com/Lezonn/fin-tools-api/internal/model"
@@ -45,5 +46,30 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 		Code:   http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
 		Data:   response,
+	})
+}
+
+func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+
+	expenseID, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
+	if err != nil {
+		c.Log.WithError(err).Error("invalid expense ID")
+		return fiber.ErrBadRequest
+	}
+
+	request := &model.DeleteExpenseRequest{}
+	request.UserID = auth.ID
+	request.ExpenseID = expenseID
+
+	if err := c.Service.Delete(ctx.UserContext(), request); err != nil {
+		c.Log.WithError(err).Error("failed to delete expense")
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   true,
 	})
 }
