@@ -24,17 +24,12 @@
 {
   "code": 200,
   "status": "OK",
-  "data": true
-}
-```
-
-+ Response 404: `application/json`
-```json5
-{
-  "code": 404,
-  "status": "NOT_FOUND",
-  "errors": {
-    "errorMessage": ["Error message here"]
+  "data": {
+    "id": "1",
+    "expense_category_id": "1",
+    "amount": 25000,
+    "note": "Purchased fried chicken",
+    "expense_date": 1689235200000
   }
 }
 ```
@@ -44,9 +39,7 @@
 {
   "code": 500,
   "status": "INTERNAL_SERVER_ERROR",
-  "errors": {
-    "errorMessage": ["Error message here"]
-  }
+  "message": "Error message here"
 }
 ```
 ---
@@ -68,14 +61,21 @@
 }
 ```
 
++ Response 404: `application/json`
+```json5
+{
+  "code": 404,
+  "status": "NOT_FOUND",
+  "message": "Error message here"
+}
+```
+
 + Response 500: `application/json`
 ```json5
 {
   "code": 500,
   "status": "INTERNAL_SERVER_ERROR",
-  "errors": {
-    "errorMessage": ["Error message here"]
-  }
+  "message": "Error message here"
 }
 ```
 ---
