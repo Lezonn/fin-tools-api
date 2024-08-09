@@ -37,4 +37,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Use(c.AuthMiddleware)
 	c.App.Get("/test-auth-resource", c.TestController.GetMessage)
 	c.App.Post("/api/expenses", c.ExpenseController.Create)
+	c.App.Delete("/api/expenses/:id", c.ExpenseController.Delete)
 }

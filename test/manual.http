@@ -10,3 +10,9 @@ Authorization: Bearer {{ token }}
   "note": "Gas",
   "expense_date": 1722330689
 }
+
+### Delete expense
+DELETE http://localhost:8080/api/expenses/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}

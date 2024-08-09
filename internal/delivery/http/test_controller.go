@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Lezonn/fin-tools-api/internal/model"
@@ -26,7 +25,6 @@ func (c *TestController) GetMessage(ctx fiber.Ctx) error {
 	message := model.TestResponse{
 		Message: "Hello World!",
 	}
-	fmt.Println(ctx.Locals("auth"))
 
 	ctx.JSON(model.WebResponse{
 		Code:   http.StatusOK,
