@@ -20,3 +20,12 @@ func NewExpenseRepository(log *logrus.Logger) *ExpenseRepository {
 func (r *ExpenseRepository) FindByIdAndUserId(db *gorm.DB, entity *entity.Expense) error {
 	return db.Where("user_id = ?", entity.UserID).Take(entity).Error
 }
+
+func (r *ExpenseRepository) GetListByUserId(db *gorm.DB, userId int64) ([]entity.Expense, error) {
+	var expenses []entity.Expense
+	if err := db.Where("user_id", userId).Find(&expenses).Error; err != nil {
+		return nil, err
+	}
+
+	return expenses, nil
+}

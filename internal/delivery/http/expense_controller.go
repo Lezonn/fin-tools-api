@@ -106,6 +106,26 @@ func (c *ExpenseController) Update(ctx fiber.Ctx) error {
 	})
 }
 
+func (c *ExpenseController) List(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+
+	request := &model.ListExpenseRequest{
+		UserID: auth.ID,
+	}
+
+	response, err := c.Service.List(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to list expenses")
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   response,
+	})
+}
+
 func getIdFromParam(ctx fiber.Ctx) (int64, error) {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
 	if err != nil {

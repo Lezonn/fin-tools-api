@@ -2,8 +2,8 @@
 1. Create
 2. Delete
 3. Update
-4. Get List
-5. Get by ID
+4. List
+5. Get
 
 ---
 
@@ -122,7 +122,7 @@
 ```
 ---
 
-### Get List
+### List
 > Used to get expense list.
 
 + Endpoint: **`/api/expenses`**
@@ -160,7 +160,7 @@
 ```
 ---
 
-### Get by ID
+### Get
 > Used to get expense detail by ID.
 
 + Endpoint: **`/api/expenses/:id`**

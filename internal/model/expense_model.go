@@ -29,3 +29,7 @@ type UpdateExpenseRequest struct {
 	Note              string `json:"note"`
 	ExpenseDate       int64  `json:"expense_date"`
 }
+
+type ListExpenseRequest struct {
+	UserID int64 `json:"user_id" validate:"required"`
+}

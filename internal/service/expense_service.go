@@ -5,6 +5,7 @@ import (
 
 	"github.com/Lezonn/fin-tools-api/internal/entity"
 	"github.com/Lezonn/fin-tools-api/internal/model"
+	"github.com/Lezonn/fin-tools-api/internal/model/converter"
 	"github.com/Lezonn/fin-tools-api/internal/model/exception"
 	"github.com/Lezonn/fin-tools-api/internal/repository"
 	"github.com/go-playground/validator/v10"
@@ -126,4 +127,24 @@ func (s *ExpenseService) Update(ctx context.Context, request *model.UpdateExpens
 	}
 
 	return nil
+}
+
+func (s *ExpenseService) List(ctx context.Context, request *model.ListExpenseRequest) ([]model.ExpenseResponse, error) {
+	if err := s.Validate.Struct(request); err != nil {
+		s.Log.WithError(err).Error("failed to validate request")
+		return nil, exception.BadRequest("failed to validate request")
+	}
+
+	expenses, err := s.ExpenseRepository.GetListByUserId(s.DB, request.UserID)
+	if err != nil {
+		s.Log.WithError(err).Error("failed to get expenses")
+		return nil, exception.InternalServerError("failed to get expenses")
+	}
+
+	response := make([]model.ExpenseResponse, len(expenses))
+	for i, expense := range expenses {
+		response[i] = *converter.ExpenseToResponse(&expense)
+	}
+
+	return response, nil
 }
