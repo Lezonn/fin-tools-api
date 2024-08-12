@@ -1,10 +1,10 @@
 # Expenses API
-1. Create Expense
-2. Delete Expense
+1. Create
+2. Delete
 
 ---
 
-### Create Expense
+### Create
 > Used to create new expense.
 
 + Endpoint: **`/api/expenses`**
@@ -15,7 +15,7 @@
   "expense_category_id": 1,
   "amount": 25000,
   "note": "Purchased fried chicken",
-  "expense_date": 1689235200000
+  "expense_date": 1722330689
 }
 ```
 
@@ -24,13 +24,7 @@
 {
   "code": 200,
   "status": "OK",
-  "data": {
-    "id": "1",
-    "expense_category_id": "1",
-    "amount": 25000,
-    "note": "Purchased fried chicken",
-    "expense_date": 1689235200000
-  }
+  "data": true
 }
 ```
 
@@ -44,7 +38,7 @@
 ```
 ---
 
-### Delete Expense
+### Delete
 > Used to delete expense.
 
 + Endpoint: **`/api/expenses/:id`**

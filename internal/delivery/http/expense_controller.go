@@ -36,8 +36,7 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 
 	request.UserID = auth.ID
 
-	response, err := c.Service.Create(ctx.UserContext(), request)
-	if err != nil {
+	if err := c.Service.Create(ctx.UserContext(), request); err != nil {
 		c.Log.WithError(err).Error("failed to create expense")
 		return err
 	}
@@ -45,7 +44,7 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 	return ctx.JSON(model.WebResponse{
 		Code:   http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
-		Data:   response,
+		Data:   true,
 	})
 }
 
