@@ -52,7 +52,7 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	expenseID, err := GetIdFromParam(ctx)
+	expenseID, err := getIdFromParam(ctx)
 	if err != nil {
 		c.Log.WithError(err).Error("failed to parse expense ID")
 		return fiber.ErrBadRequest
@@ -78,7 +78,7 @@ func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 func (c *ExpenseController) Update(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	expenseID, err := GetIdFromParam(ctx)
+	expenseID, err := getIdFromParam(ctx)
 	if err != nil {
 		c.Log.WithError(err).Error("failed to parse expense ID")
 		return err
@@ -106,7 +106,7 @@ func (c *ExpenseController) Update(ctx fiber.Ctx) error {
 	})
 }
 
-func GetIdFromParam(ctx fiber.Ctx) (int64, error) {
+func getIdFromParam(ctx fiber.Ctx) (int64, error) {
 	id, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
 	if err != nil {
 		return 0, fiber.ErrBadRequest
