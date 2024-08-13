@@ -28,16 +28,16 @@ func NewExpenseController(logger *logrus.Logger, service *service.ExpenseService
 func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	request := &model.CreateExpenseRequest{}
+	request := &model.CreateExpenseRequest{
+		UserID: auth.ID,
+	}
+
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.WithError(err).Error("failed to create expense")
 		return fiber.ErrBadRequest
 	}
 
-	request.UserID = auth.ID
-
-	response, err := c.Service.Create(ctx.UserContext(), request)
-	if err != nil {
+	if err := c.Service.Create(ctx.UserContext(), request); err != nil {
 		c.Log.WithError(err).Error("failed to create expense")
 		return err
 	}
@@ -45,22 +45,23 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 	return ctx.JSON(model.WebResponse{
 		Code:   http.StatusOK,
 		Status: http.StatusText(http.StatusOK),
-		Data:   response,
+		Data:   true,
 	})
 }
 
 func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	expenseID, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
+	expenseID, err := GetIdFromParam(ctx)
 	if err != nil {
-		c.Log.WithError(err).Error("invalid expense ID")
+		c.Log.WithError(err).Error("failed to parse expense ID")
 		return fiber.ErrBadRequest
 	}
 
-	request := &model.DeleteExpenseRequest{}
-	request.UserID = auth.ID
-	request.ExpenseID = expenseID
+	request := &model.DeleteExpenseRequest{
+		UserID:    auth.ID,
+		ExpenseID: expenseID,
+	}
 
 	if err := c.Service.Delete(ctx.UserContext(), request); err != nil {
 		c.Log.WithError(err).Error("failed to delete expense")
@@ -72,4 +73,44 @@ func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 		Status: http.StatusText(http.StatusOK),
 		Data:   true,
 	})
+}
+
+func (c *ExpenseController) Update(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+
+	expenseID, err := GetIdFromParam(ctx)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to parse expense ID")
+		return err
+	}
+
+	request := &model.UpdateExpenseRequest{
+		UserID:    auth.ID,
+		ExpenseID: expenseID,
+	}
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.WithError(err).Error("failed to create expense")
+		return fiber.ErrBadRequest
+	}
+
+	if err := c.Service.Update(ctx.UserContext(), request); err != nil {
+		c.Log.WithError(err).Error("failed to update expense")
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   true,
+	})
+}
+
+func GetIdFromParam(ctx fiber.Ctx) (int64, error) {
+	id, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
+	if err != nil {
+		return 0, fiber.ErrBadRequest
+	}
+
+	return id, nil
 }

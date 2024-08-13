@@ -17,6 +17,15 @@ type CreateExpenseRequest struct {
 }
 
 type DeleteExpenseRequest struct {
-	UserID    int64 `json:"user_id" validate:"required"`
 	ExpenseID int64 `json:"expense_id" validate:"required"`
+	UserID    int64 `json:"user_id" validate:"required"`
+}
+
+type UpdateExpenseRequest struct {
+	ExpenseID         int64  `json:"expense_id" validate:"required"`
+	UserID            int64  `json:"user_id" validate:"required"`
+	ExpenseCategoryID int64  `json:"expense_category_id"`
+	Amount            int64  `json:"amount"`
+	Note              string `json:"note"`
+	ExpenseDate       int64  `json:"expense_date"`
 }

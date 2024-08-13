@@ -17,6 +17,6 @@ func NewExpenseRepository(log *logrus.Logger) *ExpenseRepository {
 	}
 }
 
-func (r *ExpenseRepository) FindByIdAndUserId(db *gorm.DB, entity *entity.Expense, id int64, userId int64) error {
-	return db.Where("id = ? AND user_id = ?", id, userId).Take(entity).Error
+func (r *ExpenseRepository) FindByIdAndUserId(db *gorm.DB, entity *entity.Expense) error {
+	return db.Where("user_id = ?", entity.UserID).Take(entity).Error
 }

@@ -12,7 +12,20 @@ Authorization: Bearer {{ token }}
 }
 
 ### Delete expense
-DELETE http://localhost:8080/api/expenses/1
+DELETE http://localhost:8080/api/expenses/5
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{ token }}
+
+### Update expense
+PATCH http://localhost:8080/api/expenses/6
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}
+
+{
+  "expense_category_id": 1,
+  "amount": 30000,
+  "note": "Makan",
+  "expense_date": 1723436107
+}
