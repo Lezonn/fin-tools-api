@@ -23,7 +23,7 @@ func (r *ExpenseRepository) FindByIdAndUserId(db *gorm.DB, entity *entity.Expens
 
 func (r *ExpenseRepository) GetListByUserId(db *gorm.DB, userId int64) ([]entity.Expense, error) {
 	var expenses []entity.Expense
-	if err := db.Where("user_id", userId).Find(&expenses).Error; err != nil {
+	if err := db.Order("expense_date desc").Where("user_id", userId).Preload("ExpenseCategory").Find(&expenses).Error; err != nil {
 		return nil, err
 	}
 

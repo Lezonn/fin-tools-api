@@ -1,11 +1,11 @@
 package model
 
 type ExpenseResponse struct {
-	ID                int64  `json:"id"`
-	ExpenseCategoryID int64  `json:"expense_category_id"`
-	Amount            int64  `json:"amount"`
-	Note              string `json:"note"`
-	ExpenseDate       int64  `json:"expense_date"`
+	ID                  int64  `json:"id"`
+	ExpenseCategoryName string `json:"expense_category_name"`
+	Amount              int64  `json:"amount"`
+	Note                string `json:"note"`
+	ExpenseDate         int64  `json:"expense_date"`
 }
 
 type CreateExpenseRequest struct {
