@@ -35,3 +35,9 @@ GET http://localhost:8080/api/expenses
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{ token }}
+
+### List expense category
+GET http://localhost:8080/api/expense-categories
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}

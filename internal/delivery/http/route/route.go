@@ -7,11 +7,12 @@ import (
 )
 
 type RouteConfig struct {
-	App               *fiber.App
-	TestController    *http.TestController
-	LoginController   *http.UserController
-	ExpenseController *http.ExpenseController
-	AuthMiddleware    fiber.Handler
+	App                       *fiber.App
+	TestController            *http.TestController
+	LoginController           *http.UserController
+	ExpenseController         *http.ExpenseController
+	ExpenseCategoryController *http.ExpenseCategoryController
+	AuthMiddleware            fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -40,4 +41,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Delete("/api/expenses/:id", c.ExpenseController.Delete)
 	c.App.Patch("/api/expenses/:id", c.ExpenseController.Update)
 	c.App.Get("/api/expenses", c.ExpenseController.List)
+	c.App.Get("/api/expense-categories", c.ExpenseCategoryController.List)
 }
