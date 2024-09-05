@@ -2,9 +2,9 @@ package http
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Lezonn/fin-tools-api/internal/delivery/http/middleware"
+	"github.com/Lezonn/fin-tools-api/internal/helper"
 	"github.com/Lezonn/fin-tools-api/internal/model"
 	"github.com/Lezonn/fin-tools-api/internal/service"
 	"github.com/gofiber/fiber/v3"
@@ -52,7 +52,7 @@ func (c *ExpenseController) Create(ctx fiber.Ctx) error {
 func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	expenseID, err := GetIdFromParam(ctx)
+	expenseID, err := helper.GetIdFromParam(ctx)
 	if err != nil {
 		c.Log.WithError(err).Error("failed to parse expense ID")
 		return fiber.ErrBadRequest
@@ -78,7 +78,7 @@ func (c *ExpenseController) Delete(ctx fiber.Ctx) error {
 func (c *ExpenseController) Update(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 
-	expenseID, err := GetIdFromParam(ctx)
+	expenseID, err := helper.GetIdFromParam(ctx)
 	if err != nil {
 		c.Log.WithError(err).Error("failed to parse expense ID")
 		return err
@@ -106,11 +106,22 @@ func (c *ExpenseController) Update(ctx fiber.Ctx) error {
 	})
 }
 
-func GetIdFromParam(ctx fiber.Ctx) (int64, error) {
-	id, err := strconv.ParseInt(ctx.Params("id"), 10, 16)
-	if err != nil {
-		return 0, fiber.ErrBadRequest
+func (c *ExpenseController) List(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+
+	request := &model.ListExpenseRequest{
+		UserID: auth.ID,
 	}
 
-	return id, nil
+	response, err := c.Service.List(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to list expenses")
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   response,
+	})
 }

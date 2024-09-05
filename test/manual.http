@@ -12,7 +12,7 @@ Authorization: Bearer {{ token }}
 }
 
 ### Delete expense
-DELETE http://localhost:8080/api/expenses/5
+DELETE http://localhost:8080/api/expenses/6
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{ token }}
@@ -29,3 +29,15 @@ Authorization: Bearer {{ token }}
   "note": "Makan",
   "expense_date": 1723436107
 }
+
+### List expense
+GET http://localhost:8080/api/expenses
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}
+
+### List expense category
+GET http://localhost:8080/api/expense-categories
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{ token }}

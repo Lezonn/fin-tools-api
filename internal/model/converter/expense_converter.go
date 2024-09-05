@@ -7,10 +7,10 @@ import (
 
 func ExpenseToResponse(expense *entity.Expense) *model.ExpenseResponse {
 	return &model.ExpenseResponse{
-		ID:                expense.ID,
-		ExpenseCategoryID: expense.ExpenseCategoryID,
-		Amount:            expense.Amount,
-		Note:              expense.Note,
-		ExpenseDate:       expense.ExpenseDate,
+		ID:                  expense.ID,
+		ExpenseCategoryName: expense.ExpenseCategory.ExpenseCategoryName,
+		Amount:              expense.Amount,
+		Note:                expense.Note,
+		ExpenseDate:         expense.ExpenseDate,
 	}
 }

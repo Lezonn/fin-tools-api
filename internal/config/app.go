@@ -27,14 +27,17 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repository
 	userRepository := repository.NewUserRepository(config.Log)
 	expenseRepository := repository.NewExpenseRepository(config.Log)
+	expenseCategoryRepository := repository.NewExpenseCategoryRepository(config.Log)
 
 	// setup service
 	userService := service.NewUserService(config.Config, config.DB, config.Log, config.Validate, userRepository)
 	expenseService := service.NewExpenseService(config.DB, config.Log, config.Validate, expenseRepository)
+	expenseCategoryService := service.NewExpenseCategoryService(config.DB, config.Log, config.Validate, expenseCategoryRepository)
 
 	// setup controller
 	loginController := http.NewUserController(config.Config, config.GoogleLoginConfig, config.Log, userService)
 	expenseController := http.NewExpenseController(config.Log, expenseService)
+	expenseCategoryController := http.NewExpenseCategoryController(config.Log, expenseCategoryService)
 	testController := http.NewTestController(config.Config, config.Log)
 
 	// setup middleware
@@ -42,11 +45,12 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup route
 	routeConfig := route.RouteConfig{
-		App:               config.App,
-		LoginController:   loginController,
-		ExpenseController: expenseController,
-		TestController:    testController,
-		AuthMiddleware:    authMiddleware,
+		App:                       config.App,
+		LoginController:           loginController,
+		ExpenseController:         expenseController,
+		ExpenseCategoryController: expenseCategoryController,
+		TestController:            testController,
+		AuthMiddleware:            authMiddleware,
 	}
 
 	routeConfig.Setup()
